@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overspan Dashboard</title>
+<meta name="overspan-key" content="__ADMIN_KEY__">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="/assets/ui.css">
+<link rel="stylesheet" href="/assets/admin.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="a-header">
+  <div class="a-brand">
+    <img src="/assets/icon.svg" alt="" class="icon-lg">
+    <div class="a-brand-text">
+      <span class="a-product">Overspan</span>
+      <span id="hdr-name" class="a-host truncate muted small"><span class="skeleton a-skel-host"></span></span>
+    </div>
+  </div>
+  <div class="a-power">
+    <span id="hdr-status" class="badge">Starting</span>
+    <label class="switch" title="Accept new viewers">
+      <input id="hdr-enabled" type="checkbox" aria-label="Accept viewers">
+      <span class="track"></span>
+    </label>
+  </div>
+</header>
+
+<div class="a-shell">
+  <nav class="a-nav" aria-label="Sections">
+    <a href="#/overview" data-route="overview">Overview</a>
+    <a href="#/display" data-route="display">Display</a>
+    <a href="#/security" data-route="security">Security</a>
+    <a href="#/system" data-route="system">System</a>
+  </nav>
+
+  <main id="main" class="a-main" tabindex="-1">
+    <div id="conn-banner" class="banner banner-danger" role="alert" hidden>Lost contact with the Overspan server. Retrying&hellip;</div>
+
+    <!-- S01 overview -->
+    <section data-page="overview" class="stack" aria-labelledby="h-overview">
+      <h1 id="h-overview">Overview</h1>
+      <div id="pending" class="stack" aria-live="assertive"></div>
+
+      <div class="a-grid">
+        <article class="card a-join" aria-labelledby="h-join">
+          <div class="card-head"><h2 id="h-join">Connect a device</h2></div>
+          <div class="a-join-body">
+            <div id="qr" class="a-qr" aria-label="QR code with the viewer address"><span class="skeleton a-qr-skel"></span></div>
+            <ol class="a-steps">
+              <li>Put the phone, tablet or laptop on the same network as this computer.</li>
+              <li>Scan the code, or open this address in its browser:
+                <div id="addresses" class="stack-sm a-addrs"><span class="skeleton"></span></div>
+              </li>
+              <li>Tap <strong>Connect</strong>, then accept the device here.</li>
+            </ol>
+          </div>
+        </article>
+
+        <article class="card" aria-labelledby="h-layout">
+          <div class="card-head"><h2 id="h-layout">Monitor layout</h2><span id="layout-backend" class="card-sub"></span></div>
+          <div id="layout" class="a-layout" role="img" aria-label="Arrangement of monitors"><span class="skeleton a-layout-skel"></span></div>
+          <ul id="layout-legend" class="a-legend small muted"></ul>
+        </article>
+      </div>
+
+      <article class="card" aria-labelledby="h-viewers">
+        <div class="card-head"><h2 id="h-viewers">Connected devices</h2><span id="viewer-count" class="card-sub"></span></div>
+        <div id="viewers"><span class="skeleton"></span><span class="skeleton"></span></div>
+      </article>
+    </section>
+
+    <!-- S02 display -->
+    <section data-page="display" class="stack" aria-labelledby="h-display" hidden>
+      <h1 id="h-display">Display</h1>
+      <form class="card" data-settings>
+        <div class="setting">
+          <div class="setting-text"><span id="lbl-mode">Default mode</span><p>What a device gets when it does not pick one itself.</p></div>
+          <div class="setting-control">
+            <div class="segmented" role="radiogroup" aria-labelledby="lbl-mode">
+              <label><input type="radio" name="defaultMode" value="extend"><span>Extra monitor</span></label>
+              <label><input type="radio" name="defaultMode" value="mirror"><span>Same picture</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="mirrorOutput">Screen to share</label><p>Used by devices that show the same picture.</p></div>
+          <div class="setting-control"><select id="mirrorOutput" name="mirrorOutput" class="select"></select></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><span id="lbl-place">New monitors go</span><p>Where an extra monitor sits next to your current ones.</p></div>
+          <div class="setting-control">
+            <div class="segmented" role="radiogroup" aria-labelledby="lbl-place">
+              <label><input type="radio" name="placement" value="left"><span>Left</span></label>
+              <label><input type="radio" name="placement" value="right"><span>Right</span></label>
+              <label><input type="radio" name="placement" value="above"><span>Above</span></label>
+              <label><input type="radio" name="placement" value="below"><span>Below</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="maxLongEdge">Largest monitor size</label><p>Caps how big a virtual monitor can be, whatever the device asks for.</p></div>
+          <div class="setting-control">
+            <select id="maxLongEdge" name="maxLongEdge" class="select">
+              <option value="1280">1280 px</option><option value="1920">1920 px</option>
+              <option value="2560">2560 px</option><option value="3840">3840 px</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="fps">Frame rate limit <output class="faint" data-out="fps"></output></label><p>Devices can choose lower, never higher.</p></div>
+          <div class="setting-control"><input id="fps" name="fps" type="range" min="5" max="60" step="5"></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="quality">Default image quality <output class="faint" data-out="quality"></output></label><p>Higher is sharper and needs more bandwidth.</p></div>
+          <div class="setting-control"><input id="quality" name="quality" type="range" min="20" max="95" step="5"></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="showCursor">Draw the pointer in the picture</label></div>
+          <div class="setting-control"><span class="switch"><input id="showCursor" name="showCursor" type="checkbox"><span class="track"></span></span></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="keepSeconds">Keep a monitor after a device drops</label><p>Windows stay put if the device reconnects within this time.</p></div>
+          <div class="setting-control">
+            <select id="keepSeconds" name="keepSeconds" class="select">
+              <option value="0">Remove at once</option><option value="15">15 seconds</option>
+              <option value="60">1 minute</option><option value="300">5 minutes</option>
+            </select>
+          </div>
+        </div>
+      </form>
+      <p class="small muted">Changes to size and mode apply the next time a device connects.</p>
+    </section>
+
+    <!-- S03 security -->
+    <section data-page="security" class="stack" aria-labelledby="h-security" hidden>
+      <h1 id="h-security">Security</h1>
+      <form class="card" data-settings>
+        <div class="setting">
+          <div class="setting-text"><label for="serverName">Computer name</label><p>What devices see before they connect.</p></div>
+          <div class="setting-control"><input id="serverName" name="serverName" class="input" maxlength="60"></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="requireApproval">Ask before a new device connects</label><p>Remembered devices skip the question.</p></div>
+          <div class="setting-control"><span class="switch"><input id="requireApproval" name="requireApproval" type="checkbox"><span class="track"></span></span></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="pinField">PIN</label><p>Optional. Devices must type it before anything else happens.</p></div>
+          <div class="setting-control"><input id="pinField" name="pin" class="input mono" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="No PIN"></div>
+        </div>
+        <div class="setting">
+          <div class="setting-text"><label for="allowInput">Allow touch, mouse and keyboard from devices</label><p>Off makes every device view-only.</p></div>
+          <div class="setting-control"><span class="switch"><input id="allowInput" name="allowInput" type="checkbox"><span class="track"></span></span></div>
+        </div>
+      </form>
+      <article class="card" aria-labelledby="h-trusted">
+        <div class="card-head"><h2 id="h-trusted">Remembered devices</h2></div>
+        <div id="trusted"></div>
+      </article>
+      <p class="small muted">The dashboard only opens on this computer. Devices on your network can reach the viewer page and nothing else.</p>
+    </section>
+
+    <!-- S04 system -->
+    <section data-page="system" class="stack" aria-labelledby="h-system" hidden>
+      <div class="spread"><h1 id="h-system">System</h1><button id="btn-recheck" class="btn" type="button">Check again</button></div>
+      <article class="card" aria-labelledby="h-checks">
+        <div class="card-head"><h2 id="h-checks">What works here</h2><span id="version" class="card-sub"></span></div>
+        <ul id="checks" class="list"><li><span class="skeleton grow"></span></li><li><span class="skeleton grow"></span></li></ul>
+      </article>
+      <article class="card" aria-labelledby="h-log">
+        <div class="card-head"><h2 id="h-log">Activity</h2></div>
+        <ol id="log" class="a-log mono small"></ol>
+      </article>
+    </section>
+  </main>
+</div>
+<div class="toast-region" id="toasts" aria-live="polite"></div>
+<script src="/assets/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+'use strict';
+// Overspan dashboard: live state over Server-Sent Events, settings over POST.
+
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const KEY = document.querySelector('meta[name=overspan-key]').content;
+let state = null;
+
+function h(tag, attrs = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'text') el.textContent = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid);
+  return el;
+}
+
+function toast(text) {
+  const t = h('div', { class: 'toast', text });
+  $('#toasts').append(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+async function api(method, path, body) {
+  const r = await fetch(path, {
+    method,
+    headers: { 'X-Overspan-Key': KEY, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) throw new Error((await r.text()) || r.statusText);
+  return r.json();
+}
+
+/* ---------- routing ---------- */
+const routes = ['overview', 'display', 'security', 'system'];
+function route() {
+  let name = location.hash.replace(/^#\//, '');
+  if (!routes.includes(name)) name = 'overview';
+  for (const sec of $$('[data-page]')) sec.hidden = sec.dataset.page !== name;
+  for (const a of $$('[data-route]')) {
+    if (a.dataset.route === name) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  }
+  if (name === 'system') loadChecks();
+  return name;
+}
+window.addEventListener('hashchange', () => { route(); $('#main').focus({ preventScroll: true }); });
+
+/* ---------- live state ---------- */
+function connectEvents() {
+  const es = new EventSource('/api/events?key=' + encodeURIComponent(KEY));
+  es.onmessage = (ev) => { $('#conn-banner').hidden = true; state = JSON.parse(ev.data); render(); };
+  es.onerror = () => { $('#conn-banner').hidden = false; setStatus('Offline', 'fail'); };
+}
+
+function setStatus(text, kind) {
+  const b = $('#hdr-status');
+  b.textContent = text;
+  b.className = 'badge' + (kind ? ' badge-' + kind : '');
+}
+
+function render() {
+  const s = state;
+  $('#hdr-name').textContent = s.settings.serverName || 'This computer';
+  $('#hdr-name').title = s.settings.serverName || '';
+  $('#hdr-enabled').checked = s.settings.enabled;
+  const live = s.viewers.filter((v) => v.state === 'live').length;
+  const waiting = s.viewers.filter((v) => v.state === 'waiting');
+  if (!s.settings.enabled) setStatus('Paused', 'warn');
+  else if (live) setStatus(live === 1 ? '1 device' : `${live} devices`, 'ok');
+  else setStatus('Ready', 'accent');
+  document.title = (waiting.length ? `(${waiting.length}) ` : '') + 'Overspan Dashboard';
+
+  renderPending(waiting);
+  renderJoin();
+  renderLayout();
+  renderViewers();
+  fillForms();
+  renderTrusted();
+  renderLog();
+  $('#version').textContent = 'Version ' + s.version;
+}
+
+/* ---------- overview ---------- */
+const deviceInitial = (v) => (v.agent || v.name || '?').trim().charAt(0).toUpperCase();
+
+function renderPending(waiting) {
+  const box = $('#pending');
+  const ids = waiting.map((v) => v.id).join(',');
+  if (box.dataset.ids === ids) return;
+  box.dataset.ids = ids;
+  box.replaceChildren(...waiting.map((v) => h('article', { class: 'card a-request', 'aria-label': 'Connection request' },
+    h('div', { class: 'a-device' },
+      h('div', { class: 'a-device-icon', 'aria-hidden': 'true', text: deviceInitial(v) }),
+      h('div', { class: 'a-device-main' },
+        h('p', { class: 'a-device-name', text: `${v.name} wants to connect` }),
+        h('p', { class: 'a-device-meta' },
+          h('span', { text: v.agent }), h('span', { class: 'mono', text: hostOf(v.addr) }),
+          h('span', { text: v.mode === 'extend' ? 'as an extra monitor' : 'to show the same picture' }))),
+      h('div', { class: 'a-actions' },
+        h('button', { class: 'btn btn-primary', type: 'button', onclick: () => act(v, 'approve', true) }, 'Accept and remember'),
+        h('button', { class: 'btn', type: 'button', onclick: () => act(v, 'approve', false) }, 'Accept once'),
+        h('button', { class: 'btn btn-danger', type: 'button', onclick: () => act(v, 'deny') }, 'Decline'))))));
+}
+
+async function act(v, action, remember) {
+  try {
+    await api('POST', `/api/viewers/${v.id}/${action}${remember ? '?remember=1' : ''}`);
+    if (action === 'disconnect') toast(`Disconnected ${v.name}`);
+  } catch (e) { toast(e.message); }
+}
+
+const hostOf = (addr) => addr.replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
+
+function renderJoin() {
+  const qr = $('#qr');
+  if (qr.dataset.svg !== state.qr) {
+    qr.dataset.svg = state.qr;
+    if (state.qr) qr.innerHTML = state.qr; // generated by our own server
+    else qr.replaceChildren(h('p', { class: 'small muted', text: 'No network' }));
+  }
+  const box = $('#addresses');
+  const key = state.addresses.join(' ');
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  if (!state.addresses.length) {
+    box.replaceChildren(h('p', { class: 'banner', text: 'This computer is not on a network. Connect to Wi-Fi or Ethernet first.' }));
+    return;
+  }
+  box.replaceChildren(...state.addresses.map((a) => h('div', { class: 'a-addr' },
+    h('code', { text: a }),
+    h('button', { class: 'btn btn-ghost', type: 'button', 'aria-label': 'Copy ' + a, onclick: () => copy(a) }, 'Copy'))));
+}
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast('Address copied'); }
+  catch { toast('Copy failed: select the address instead'); }
+}
+
+function renderLayout() {
+  const outs = state.outputs || [];
+  const box = $('#layout');
+  $('#layout-backend').textContent = state.backend === 'none' ? 'No display backend' : 'Backend: ' + state.backend;
+  const key = JSON.stringify(outs);
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  if (!outs.length) {
+    box.replaceChildren(h('p', { class: 'empty', text: 'No monitors reported by this desktop.' }));
+    $('#layout-legend').replaceChildren();
+    return;
+  }
+  const minX = Math.min(...outs.map((o) => o.x)), minY = Math.min(...outs.map((o) => o.y));
+  const maxX = Math.max(...outs.map((o) => o.x + o.w)), maxY = Math.max(...outs.map((o) => o.y + o.h));
+  const bw = maxX - minX, bh = maxY - minY;
+  // fit the layout inside the 16:7 box with a margin
+  const boxRatio = 16 / 7, pad = 0.08;
+  let sw, sh;
+  if (bw / bh > boxRatio) { sw = 1 - 2 * pad; sh = (sw * boxRatio * bh) / bw; } else { sh = 1 - 2 * pad; sw = (sh * bw) / bh / boxRatio; }
+  const ox = (1 - sw) / 2, oy = (1 - sh) / 2;
+  box.setAttribute('aria-label', 'Monitors: ' + outs.map((o) => `${o.name} ${o.pxW} by ${o.pxH}${o.virtual ? ', virtual' : ''}`).join('; '));
+  box.replaceChildren(...outs.map((o) => {
+    const el = h('div', { class: 'a-mon' + (o.virtual ? ' virtual' : ''), title: `${o.name} ${o.pxW}×${o.pxH} at ${o.x},${o.y}` },
+      h('span', {}, o.name, h('br'), `${o.pxW}×${o.pxH}`));
+    el.style.left = (ox + ((o.x - minX) / bw) * sw) * 100 + '%';
+    el.style.top = (oy + ((o.y - minY) / bh) * sh) * 100 + '%';
+    el.style.width = (o.w / bw) * sw * 100 + '%';
+    el.style.height = (o.h / bh) * sh * 100 + '%';
+    return el;
+  }));
+  $('#layout-legend').replaceChildren(
+    h('li', {}, h('i', { 'aria-hidden': 'true' }), 'Physical'),
+    h('li', {}, h('i', { class: 'virtual', 'aria-hidden': 'true' }), 'Made by Overspan'));
+}
+
+function since(t) {
+  const s = Math.max(0, (Date.now() - new Date(t).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + ' min';
+  return Math.floor(s / 3600) + ' h ' + Math.floor((s % 3600) / 60) + ' min';
+}
+
+function renderViewers() {
+  const box = $('#viewers');
+  const list = state.viewers.filter((v) => v.state !== 'waiting');
+  $('#viewer-count').textContent = list.length ? `${list.length} connected` : '';
+  if (!list.length) {
+    if (box.dataset.empty === '1') return;
+    box.dataset.empty = '1';
+    box.replaceChildren(h('div', { class: 'empty' },
+      h('strong', { text: 'No devices yet' }),
+      h('span', { text: 'Scan the code above with a phone or tablet to add a screen.' })));
+    return;
+  }
+  if (box.dataset.empty === '1') { box.dataset.empty = '0'; box.replaceChildren(); }
+  const seen = new Set();
+  for (const v of list) {
+    seen.add(v.id);
+    let row = box.querySelector(`[data-id="${v.id}"]`);
+    if (!row) {
+      row = h('div', { class: 'a-device', 'data-id': v.id },
+        h('div', { class: 'a-device-icon', 'aria-hidden': 'true', text: deviceInitial(v) }),
+        h('div', { class: 'a-device-main' },
+          h('p', { class: 'a-device-name', text: v.name }),
+          h('p', { class: 'a-device-meta' }, h('span', { 'data-f': 'meta' }))),
+        h('div', { class: 'a-device-stats', 'data-f': 'stats', 'aria-label': 'Stream statistics' }),
+        h('button', { class: 'btn btn-danger', type: 'button', onclick: () => act(v, 'disconnect') }, 'Disconnect'));
+      box.append(row);
+    }
+    const mode = v.mode === 'extend' ? 'Extra monitor' : 'Same picture';
+    const size = v.width ? ` · ${v.output} ${v.width}×${v.height}` : '';
+    const st = v.state === 'starting' ? ' · setting up' : ` · ${since(v.since)}`;
+    $('[data-f=meta]', row).textContent = `${v.agent} · ${hostOf(v.addr)} · ${mode}${size}${st}`;
+    $('[data-f=stats]', row).textContent = v.state === 'live' ? `${v.fps.toFixed(0)} fps · ${v.kbps} KB/s` : '';
+  }
+  for (const row of $$('[data-id]', box)) if (!seen.has(row.dataset.id)) row.remove();
+}
+
+/* ---------- settings forms ---------- */
+function fillForms() {
+  const s = state.settings;
+  const sel = $('#mirrorOutput');
+  const outs = (state.outputs || []).filter((o) => !o.virtual);
+  const key = outs.map((o) => o.name).join(',');
+  if (sel.dataset.key !== key) {
+    sel.dataset.key = key;
+    sel.replaceChildren(h('option', { value: '', text: 'Main screen' }), ...outs.map((o) => h('option', { value: o.name, text: `${o.name} (${o.pxW}×${o.pxH})` })));
+  }
+  for (const form of $$('form[data-settings]')) {
+    for (const el of form.elements) {
+      if (!el.name || el === document.activeElement || !(el.name in s)) continue;
+      if (el.type === 'checkbox') el.checked = !!s[el.name];
+      else if (el.type === 'radio') el.checked = String(s[el.name]) === el.value;
+      else el.value = s[el.name];
+      const out = $(`[data-out="${el.name}"]`);
+      if (out) out.textContent = el.value;
+    }
+  }
+  const ext = $('input[name=defaultMode][value=extend]');
+  ext.disabled = !state.canExtend;
+}
+
+async function saveSetting(el) {
+  const next = { ...state.settings };
+  if (el.type === 'checkbox') next[el.name] = el.checked;
+  else if (el.type === 'range' || el.tagName === 'SELECT' && /^\d+$/.test(el.value) && el.name !== 'mirrorOutput') next[el.name] = Number(el.value);
+  else next[el.name] = el.value;
+  if (el.name === 'pin' && next.pin && !/^\d{4,12}$/.test(next.pin)) {
+    el.setAttribute('aria-invalid', 'true');
+    toast('Use 4 to 12 digits for the PIN');
+    return;
+  }
+  el.removeAttribute('aria-invalid');
+  try {
+    state.settings = await api('POST', '/api/settings', next);
+    toast('Saved');
+  } catch (e) { toast('Not saved: ' + e.message); }
+}
+
+for (const form of $$('form[data-settings]')) {
+  form.addEventListener('submit', (e) => e.preventDefault());
+  form.addEventListener('change', (e) => { if (e.target.name) saveSetting(e.target); });
+  form.addEventListener('input', (e) => {
+    const out = $(`[data-out="${e.target.name}"]`);
+    if (out) out.textContent = e.target.value;
+  });
+}
+
+$('#hdr-enabled').addEventListener('change', async (e) => {
+  try {
+    state.settings = await api('POST', '/api/settings', { ...state.settings, enabled: e.target.checked });
+    toast(e.target.checked ? 'Accepting devices' : 'Paused: devices were disconnected');
+  } catch (err) { toast(err.message); e.target.checked = !e.target.checked; }
+});
+
+function renderTrusted() {
+  const box = $('#trusted');
+  const list = state.settings.trusted || [];
+  const key = list.map((t) => t.deviceId + t.name).join(',');
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  if (!list.length) {
+    box.replaceChildren(h('div', { class: 'empty' }, h('strong', { text: 'None remembered' }),
+      h('span', { text: 'Choose “Accept and remember” when a device connects to skip the question next time.' })));
+    return;
+  }
+  box.replaceChildren(h('ul', { class: 'list' }, ...list.map((t) => h('li', {},
+    h('div', { class: 'grow' },
+      h('p', { class: 'a-device-name', text: t.name }),
+      h('p', { class: 'small muted', text: 'Remembered ' + new Date(t.added).toLocaleDateString() + ' · last seen ' + new Date(t.lastSeen).toLocaleString() })),
+    h('button', { class: 'btn btn-danger', type: 'button', onclick: async () => {
+      try { await api('POST', `/api/trusted/${encodeURIComponent(t.deviceId)}/forget`); toast(`Forgot ${t.name}`); } catch (e) { toast(e.message); }
+    } }, 'Forget')))));
+}
+
+/* ---------- system ---------- */
+const STATUS_TEXT = { ok: 'Works', warn: 'Limited', fail: 'Missing' };
+async function loadChecks() {
+  const box = $('#checks');
+  try {
+    const checks = await api('GET', '/api/doctor');
+    box.replaceChildren(...checks.map((c) => h('li', { class: 'a-check' },
+      h('div', { class: 'a-check-main' },
+        h('p', { class: 'a-device-name', text: c.name }),
+        h('p', { text: c.detail }),
+        c.fix ? h('code', { class: 'a-fix', text: c.fix }) : null),
+      h('span', { class: 'badge badge-' + c.status, text: STATUS_TEXT[c.status] }))));
+  } catch (e) {
+    box.replaceChildren(h('li', {}, h('p', { class: 'banner banner-danger', text: 'Could not run the checks: ' + e.message })));
+  }
+}
+$('#btn-recheck').addEventListener('click', loadChecks);
+
+function renderLog() {
+  const box = $('#log');
+  const key = state.logs.length + (state.logs.at(-1) || {}).at;
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  if (!state.logs.length) { box.replaceChildren(h('li', { class: 'muted', text: 'Nothing yet.' })); return; }
+  box.replaceChildren(...state.logs.slice().reverse().map((l) => h('li', { class: l.level },
+    h('time', { datetime: l.at, text: new Date(l.at).toLocaleTimeString() }), h('span', { text: l.text }))));
+}
+
+route();
+connectEvents();
