@@ -71,6 +71,7 @@ networks you trust.
 make test     # unit tests (QR codes are decoded with zbarimg when it is installed)
 make e2e      # full session against the running Hyprland/Sway (creates and removes a monitor)
 make shots    # screenshots of every screen through headless Chromium
+tests/android-e2e.sh   # the Android app in a headless emulator, driven through its UI
 ```
 
 Design notes, the protocol and the feature matrix are in `replica/`.

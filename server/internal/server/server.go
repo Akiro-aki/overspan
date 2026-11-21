@@ -42,6 +42,8 @@ type Server struct {
 	subs     map[chan struct{}]bool
 	layout   []vdisplay.Output
 	layoutAt time.Time
+	closing  bool
+	sessions sync.WaitGroup // one per viewer connection, so Close can wait for cleanup
 }
 
 // LogLine is one entry of the dashboard's activity log.
@@ -89,6 +91,7 @@ func New(port int, web fs.FS, backendName string) (*Server, error) {
 // Close removes every virtual monitor this server made.
 func (s *Server) Close() {
 	s.mu.Lock()
+	s.closing = true // sessions now remove their monitors at once instead of keeping them
 	viewers := make([]*Viewer, 0, len(s.viewers))
 	for _, v := range s.viewers {
 		viewers = append(viewers, v)
@@ -103,8 +106,15 @@ func (s *Server) Close() {
 		k.timer.Stop()
 		s.backend.Remove(k.output)
 	}
-	// sessions remove their own displays when stop() lands; give them a beat
-	time.Sleep(300 * time.Millisecond)
+	// Wait for every session to finish its cleanup, including one that is
+	// halfway through creating a monitor, but never hang shutdown forever.
+	done := make(chan struct{})
+	go func() { s.sessions.Wait(); close(done) }()
+	select {
+	case <-done:
+	case <-time.After(15 * time.Second):
+		log.Printf("[warn] some sessions did not finish; check for leftover OVERSPAN monitors")
+	}
 	if s.inj != nil {
 		s.inj.Close()
 	}

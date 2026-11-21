@@ -154,6 +154,16 @@ func cleanName(s string, def string) string {
 func even8(v int) int { return max(320, v-v%8) }
 
 func (s *Server) handleViewer(w http.ResponseWriter, r *http.Request) {
+	s.mu.Lock()
+	if s.closing {
+		s.mu.Unlock()
+		http.Error(w, "shutting down", http.StatusServiceUnavailable)
+		return
+	}
+	s.sessions.Add(1)
+	s.mu.Unlock()
+	defer s.sessions.Done() // registered first, so it runs after finish()
+
 	conn, err := ws.Upgrade(w, r)
 	if err != nil {
 		return
@@ -450,6 +460,9 @@ func (s *Server) finish(v *Viewer) {
 	s.mu.Lock()
 	delete(s.viewers, v.ID)
 	keep := time.Duration(s.settings.KeepSeconds) * time.Second
+	if s.closing {
+		keep = 0 // nobody will be around to remove it later
+	}
 	s.mu.Unlock()
 	v.mu.Lock()
 	own, out, spec := v.ownDisplay, v.output, v.spec

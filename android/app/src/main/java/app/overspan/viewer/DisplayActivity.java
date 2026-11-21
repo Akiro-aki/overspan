@@ -449,7 +449,7 @@ public final class DisplayActivity extends Activity implements WsClient.Listener
                         send(String.format(Locale.ROOT, "{\"t\":\"resize\",\"w\":%d,\"h\":%d}", (int) s[0], (int) s[1]));
                     }
                 })
-                .setOnDismissListener(d -> immersive())
+                .setOnDismissListener(d -> { immersive(); ui.postDelayed(autoHide, 6000); })
                 .show();
     }
 

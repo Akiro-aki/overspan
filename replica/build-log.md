@@ -9,13 +9,14 @@
 | S04 | 2026-11-21 | done | none | none |
 | V01 | 2026-11-21 | done | list of servers found on the LAN (browsers cannot send UDP) | none |
 | V02 | 2026-11-21 | done | none | Creating a monitor takes about 5 s on Ryoku (settle time), so a "setting up" state was added |
-| V03 | 2026-11-21 | partial | pen pressure and tilt; keyboard shortcuts the browser itself grabs (Ctrl+W, Ctrl+T, Super) never reach the page | Keyboard users could not reach the toolbar because every key is forwarded. Added a local Alt+Shift+O shortcut |
+| V03 | 2026-11-21 | partial | keyboard shortcuts the browser itself grabs (Ctrl+W, Ctrl+T, Super) never reach the page | Keyboard users could not reach the toolbar because every key is forwarded. Added a local Alt+Shift+O shortcut. Pen pressure and tilt added later with the tablet device |
 | V04 | 2026-11-21 | done | none | none |
 | pen | 2026-11-21 | done | pressure not checked by eye in a drawing app | Hyprland lists the uinput tablet as `overspan-pen`; hover maps within 1px |
 | C01 | 2026-11-21 | done | QR scanning (the camera would need a decoder library) | This machine's ufw drops broadcasts, so discovery also probes saved computers directly |
-| C02 | 2026-11-21 | done | none | none |
+| C02 | 2026-11-21 | done | none | Android's one-time "Viewing full screen" notice covers immersive apps until tapped; the UI test acknowledges it up front |
 | C03 | 2026-11-21 | done | none | A sleeping (DPMS off) monitor gives no frames. The server now tells the viewer after 4 s, in both viewers |
-| C04 | 2026-11-21 | done | none | none |
+| C04 | 2026-11-21 | done | none | Dialog buttons rendered in ALL CAPS from the platform theme; set to sentence case. The toolbar never auto-hid again after Settings closed; fixed |
+| fix | 2026-11-21 | done | n/a | **Monitor leak**: stopping the server while a viewer was connected left that viewer's virtual monitor on the desktop (the session kept it for the reconnect grace period, and the server exited without waiting). Found when three test monitors were left on this desktop. Shutdown now removes monitors at once and waits for sessions; `tests/shutdown-leak.mjs` guards it |
 | W01 | n/a | not started | whole page | n/a |
 | W02 | n/a | not started | whole page | n/a |
 
@@ -25,5 +26,8 @@ Notes
 - The X11 and Sway backends compile and follow their tools' documented
   commands, but this machine runs Hyprland, so they have not run against a live
   session. Treat them as untested.
+- Android: `tests/android-e2e.sh` drives the real app in a headless emulator
+  (14 checks: add by address, validation, status, approval, streaming, a tap
+  moving the desktop pointer, toolbar, settings, disconnect, saved list).
 - Clone screenshots in `replica/clone-screens/` capture the real desktop
   (V03 shows the lock screen of this machine). Re-shoot before publishing them.

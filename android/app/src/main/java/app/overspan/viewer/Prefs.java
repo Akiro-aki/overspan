@@ -35,7 +35,7 @@ final class Prefs {
         if (!n.isEmpty()) return n;
         String model = Build.MODEL == null ? "" : Build.MODEL;
         String maker = Build.MANUFACTURER == null ? "" : Build.MANUFACTURER;
-        if (!model.toLowerCase().startsWith(maker.toLowerCase()) && !maker.isEmpty()) {
+        if (!maker.isEmpty() && !maker.equalsIgnoreCase("unknown") && !model.toLowerCase().startsWith(maker.toLowerCase())) {
             model = Character.toUpperCase(maker.charAt(0)) + maker.substring(1) + " " + model;
         }
         return model.isEmpty() ? "Android device" : model;

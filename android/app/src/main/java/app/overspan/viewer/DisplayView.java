@@ -95,7 +95,11 @@ public final class DisplayView extends View {
             final int start = off + 12;
             if (len < 0 || start + len > msg.length) break;
             rects.add(new int[]{x, y});
-            jobs.add(decoders.submit(() -> BitmapFactory.decodeByteArray(msg, start, len)));
+            try {
+                jobs.add(decoders.submit(() -> BitmapFactory.decodeByteArray(msg, start, len)));
+            } catch (java.util.concurrent.RejectedExecutionException closing) {
+                return -1; // the screen is closing
+            }
             off = start + len;
         }
         synchronized (lock) {
