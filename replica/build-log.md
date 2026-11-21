@@ -39,5 +39,6 @@ Notes
   toolbar, settings, window resize following, reconnect after a server
   restart, disconnect, PIN wrong and right, paused computer, cleanup). Wine is
   not Windows: GDI+, DPI scaling and pen input still need a run on real Windows.
-- Clone screenshots in `replica/clone-screens/` capture the real desktop
-  (V03 shows the lock screen of this machine). Re-shoot before publishing them.
+- Clone screenshots in `replica/clone-screens/` show the machine they were
+  taken on (hostname, addresses, desktop), so they stay local and are not in
+  git. `make shots`, `tests/android-e2e.sh` and `make windows-e2e` recreate them.

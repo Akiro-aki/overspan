@@ -1,7 +1,4 @@
 dist/
-replica/clone-screens/V03-*
-replica/clone-screens/C03-*
 __pycache__/
-replica/clone-screens/C04-*
-replica/clone-screens/D03-*
-replica/clone-screens/D04-*
+# screenshots show this machine (hostname, addresses, desktop); kept local
+replica/clone-screens/
