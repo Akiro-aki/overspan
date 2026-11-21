@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Overspan
+GenericName=Second screen server
+Comment=Use a phone, tablet or another PC as an extra monitor
+Exec=overspan
+Icon=overspan
+Terminal=false
+Categories=Utility;
+Keywords=monitor;display;screen;tablet;second screen;extend;mirror;

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Overspan AppImage entry point. Started with no arguments (a double-click),
+# it serves and opens the dashboard; if Overspan already runs, it only opens
+# the dashboard. Any arguments go straight to the overspan command:
+#   ./Overspan-*.AppImage doctor | install-udev | serve --port 7950 | version
+here=$(dirname "$(readlink -f "$0")")
+if [ $# -eq 0 ]; then
+  exec "$here/usr/bin/overspan" serve --open
+fi
+exec "$here/usr/bin/overspan" "$@"

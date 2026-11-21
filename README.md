@@ -22,6 +22,21 @@ it shows), tap **Connect**, then accept the device on the computer.
 `overspan doctor` tells you what works in your session and how to fix what
 does not.
 
+### AppImage
+
+Prefer one file and no install? Download `Overspan-<version>-<arch>.AppImage`
+(x86_64, aarch64, i686 or armhf), make it executable and double-click it: it
+starts Overspan and opens the dashboard. From a terminal it takes the same
+commands as `overspan`:
+
+```sh
+chmod +x Overspan-0.1.0-x86_64.AppImage
+./Overspan-0.1.0-x86_64.AppImage install-udev   # once: lets the device's touch, mouse and keyboard work (asks for sudo)
+./Overspan-0.1.0-x86_64.AppImage                # serve and open the dashboard
+```
+
+Without FUSE, add `--appimage-extract-and-run`. `make appimage` builds them.
+
 ## Android app
 
 The other device can also use the native Android app (Android 8 or newer). It
