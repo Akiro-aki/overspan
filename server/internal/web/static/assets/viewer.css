@@ -1,0 +1,60 @@
+/* Viewer layout. Tokens only. */
+html, body { height: 100%; }
+body { overscroll-behavior: none; }
+.v-screen { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-4); padding-top: max(var(--space-4), env(safe-area-inset-top)); }
+.v-panel { width: 100%; max-width: calc(var(--space-8) * 7); }
+.v-title { font-size: var(--text-xl); }
+.v-skel-title { width: 60%; height: var(--text-lg); display: inline-block; }
+.v-fieldset { border: 0; padding: 0; margin: 0; }
+.v-center { align-items: center; text-align: center; }
+.v-center-row { justify-content: center; }
+.v-pin { text-align: center; font-size: var(--text-xl); letter-spacing: 0.3em; font-family: var(--font-mono); }
+.v-state-art {
+  width: var(--space-8); height: var(--space-8); border-radius: var(--radius-pill);
+  background: var(--color-accent-soft); position: relative;
+}
+.v-state-art::after {
+  content: ""; position: absolute; inset: var(--space-3); border-radius: var(--radius-pill);
+  border: var(--focus-width) solid var(--color-accent); border-right-color: transparent;
+  animation: spin 1s linear infinite;
+}
+.v-state-art[data-kind="stop"] { background: var(--color-danger-soft); }
+.v-state-art[data-kind="stop"]::after { animation: none; border: 0; background: var(--color-danger); inset: calc(var(--space-6) / 1.2); border-radius: var(--radius-sm); }
+.v-state-art[data-kind="lock"] { background: var(--color-warn-soft); }
+.v-state-art[data-kind="lock"]::after { animation: none; border-color: var(--color-warn); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .v-state-art::after { animation: none; } }
+
+.v-stream { position: fixed; inset: 0; background: var(--color-stage); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; outline: none; image-rendering: auto; }
+.v-stream.trackpad #stage { cursor: none; }
+.v-softkbd { position: absolute; left: 0; bottom: 0; width: var(--hairline); height: var(--hairline); opacity: 0; border: 0; padding: 0; font-size: var(--text-md); }
+.v-handle {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  min-width: var(--space-8); min-height: var(--space-5); border: 0; border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background: var(--color-toolbar); color: var(--color-on-toolbar); opacity: 0.55; cursor: pointer;
+  padding-top: env(safe-area-inset-top);
+}
+.v-handle:hover, .v-handle:focus-visible { opacity: 1; }
+.v-toolbar {
+  position: absolute; top: calc(var(--space-3) + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+  display: flex; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-lg);
+  background: var(--color-toolbar); color: var(--color-on-toolbar); box-shadow: var(--shadow-3);
+  max-width: calc(100vw - var(--space-4)); overflow-x: auto;
+}
+.v-tool {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-0);
+  min-width: calc(var(--touch-min) + var(--space-5)); min-height: var(--touch-min); padding: var(--space-2);
+  border: 0; border-radius: var(--radius-md); background: transparent; color: inherit;
+  font: inherit; font-size: var(--text-xs); cursor: pointer;
+}
+.v-tool:hover { background: rgba(255, 255, 255, 0.1); }
+.v-tool[aria-pressed="true"] { background: var(--color-accent); color: var(--color-on-accent); }
+.v-tool-danger { color: var(--color-danger); }
+.v-stats {
+  position: absolute; left: var(--space-2); bottom: var(--space-2); padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm); background: var(--color-toolbar); color: var(--color-on-toolbar); font-size: var(--text-xs);
+  pointer-events: none;
+}
+.v-stream-banner { position: absolute; left: 50%; bottom: var(--space-5); transform: translateX(-50%); max-width: calc(100vw - var(--space-5)); }
+@media (max-width: 480px) { .v-tool span { display: none; } .v-tool { min-width: var(--touch-min); } }

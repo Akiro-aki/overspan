@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0f1218">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Overspan Viewer</title>
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="/assets/ui.css">
+<link rel="stylesheet" href="/assets/viewer.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M6 13.5h1M17 13.5h1M9 13.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pad" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 15h18M12 15v4" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10m0-1.5a1.5 1.5 0 0 1 3 0V11m0-1a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L4.3 14a1.5 1.5 0 0 1 2.4-1.8L9 14.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3 5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 6.5a7 7 0 1 0 10 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-extend" viewBox="0 0 24 24"><rect x="2" y="6" width="10" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="12" y="8" width="10" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2.4 1.6"/></symbol>
+  <symbol id="i-mirror" viewBox="0 0 24 24"><rect x="2" y="7" width="9" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="7" width="9" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 17.5h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</svg>
+
+<!-- V01 connect -->
+<main id="screen-connect" class="v-screen" hidden>
+  <div class="v-panel stack">
+    <header class="row">
+      <img src="/assets/icon.svg" alt="" class="icon-lg">
+      <div class="grow">
+        <h1 class="v-title">Overspan</h1>
+        <p class="muted small">Use this screen as another monitor.</p>
+      </div>
+    </header>
+
+    <section class="card stack" aria-labelledby="srv-name">
+      <div class="spread">
+        <div class="grow">
+          <p class="xs faint">Computer</p>
+          <h2 id="srv-name" class="truncate"><span class="skeleton v-skel-title"></span></h2>
+        </div>
+        <span id="srv-status" class="badge">Checking</span>
+      </div>
+
+      <fieldset class="stack-sm v-fieldset">
+        <legend class="field-label">How should this screen work?</legend>
+        <div class="segmented segmented-block" role="radiogroup">
+          <label><input type="radio" name="mode" value="extend" checked><span><svg class="icon"><use href="#i-extend"/></svg>Extra monitor</span></label>
+          <label><input type="radio" name="mode" value="mirror"><span><svg class="icon"><use href="#i-mirror"/></svg>Same picture</span></label>
+        </div>
+        <p id="mode-hint" class="field-hint">Adds a new monitor next to the computer's screen.</p>
+      </fieldset>
+
+      <div class="field">
+        <label for="dev-name">Name for this device</label>
+        <input id="dev-name" class="input" maxlength="60" autocomplete="off" spellcheck="false">
+        <p class="field-hint">Shown on the computer when you connect.</p>
+      </div>
+
+      <button id="btn-connect" class="btn btn-primary btn-lg btn-block" type="button">Connect</button>
+      <p id="connect-note" class="field-hint" role="status"></p>
+    </section>
+
+    <div class="spread small">
+      <button id="btn-open-settings" class="btn btn-ghost" type="button"><svg class="icon"><use href="#i-gear"/></svg>Picture and input</button>
+      <button id="btn-other" class="btn btn-ghost" type="button">Different computer</button>
+    </div>
+  </div>
+</main>
+
+<!-- V02 states: waiting, pin, error -->
+<main id="screen-state" class="v-screen" hidden>
+  <div class="v-panel stack v-center">
+    <div id="state-art" class="v-state-art" aria-hidden="true"></div>
+    <h1 id="state-title" class="v-title">Connecting</h1>
+    <p id="state-text" class="muted"></p>
+    <form id="pin-form" class="stack-sm" hidden>
+      <div class="field">
+        <label for="pin">PIN</label>
+        <input id="pin" class="input v-pin" inputmode="numeric" autocomplete="one-time-code" maxlength="12" required>
+        <p id="pin-error" class="field-hint" role="alert"></p>
+      </div>
+      <button class="btn btn-primary btn-lg btn-block" type="submit">Continue</button>
+    </form>
+    <div class="row v-center-row">
+      <button id="btn-state-retry" class="btn btn-primary" type="button" hidden>Try again</button>
+      <button id="btn-state-back" class="btn" type="button">Back</button>
+    </div>
+  </div>
+</main>
+
+<!-- V03 stream -->
+<main id="screen-stream" class="v-stream" hidden aria-label="Remote display">
+  <canvas id="stage" tabindex="0" aria-label="Picture from the computer. Touch, mouse and keyboard input go to the computer."></canvas>
+  <div id="stats" class="v-stats mono" hidden aria-live="off"></div>
+  <input id="soft-kbd" class="v-softkbd" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type on the computer">
+  <button id="tb-handle" class="v-handle" type="button" aria-label="Show toolbar" aria-expanded="false"><svg class="icon"><use href="#i-chevron"/></svg></button>
+  <nav id="toolbar" class="v-toolbar" aria-label="Viewer controls" hidden>
+    <button class="v-tool" data-act="keyboard" type="button" aria-label="Keyboard"><svg class="icon"><use href="#i-keyboard"/></svg><span>Keyboard</span></button>
+    <button class="v-tool" data-act="touchmode" type="button" aria-label="Touch mode" aria-pressed="false"><svg class="icon"><use href="#i-hand"/></svg><span id="touchmode-label">Direct</span></button>
+    <button class="v-tool" data-act="fullscreen" type="button" aria-label="Full screen"><svg class="icon"><use href="#i-expand"/></svg><span>Full screen</span></button>
+    <button class="v-tool" data-act="settings" type="button" aria-label="Settings"><svg class="icon"><use href="#i-gear"/></svg><span>Settings</span></button>
+    <button class="v-tool v-tool-danger" data-act="disconnect" type="button" aria-label="Disconnect"><svg class="icon"><use href="#i-power"/></svg><span>Disconnect</span></button>
+  </nav>
+  <div id="stream-banner" class="v-stream-banner banner" role="status" hidden></div>
+</main>
+
+<!-- V04 settings -->
+<dialog id="settings" class="sheet" aria-labelledby="settings-title">
+  <div class="sheet-head">
+    <h2 id="settings-title">Picture and input</h2>
+    <button class="btn btn-ghost btn-icon" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
+  </div>
+  <form class="sheet-body" method="dialog">
+    <div class="setting">
+      <div class="setting-text"><label for="set-res">Resolution</label><p>Lower is lighter on Wi-Fi and battery.</p></div>
+      <div class="setting-control">
+        <select id="set-res" class="select">
+          <option value="native">Sharpest (full)</option>
+          <option value="balanced">Balanced</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+    </div>
+    <div class="setting">
+      <div class="setting-text"><label for="set-quality">Image quality <output id="out-quality" class="faint"></output></label><p>Higher looks cleaner and uses more bandwidth.</p></div>
+      <div class="setting-control"><input id="set-quality" type="range" min="30" max="95" step="5"></div>
+    </div>
+    <div class="setting">
+      <div class="setting-text"><label for="set-fps">Frame rate limit <output id="out-fps" class="faint"></output></label><p>Frames per second at most.</p></div>
+      <div class="setting-control"><input id="set-fps" type="range" min="10" max="60" step="5"></div>
+    </div>
+    <div class="setting">
+      <div class="setting-text"><span id="lbl-touch">Touch acts as</span><p>Direct taps where you touch. Trackpad moves the pointer like a laptop pad.</p></div>
+      <div class="setting-control">
+        <div class="segmented" role="radiogroup" aria-labelledby="lbl-touch">
+          <label><input type="radio" name="touch" value="direct"><span>Direct</span></label>
+          <label><input type="radio" name="touch" value="trackpad"><span>Trackpad</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="setting">
+      <div class="setting-text"><label for="set-stats">Show connection stats</label></div>
+      <div class="setting-control"><span class="switch"><input id="set-stats" type="checkbox"><span class="track"></span></span></div>
+    </div>
+    <div class="setting">
+      <div class="setting-text"><label for="set-rotate">Follow screen rotation</label><p>Resize the extra monitor when this device turns.</p></div>
+      <div class="setting-control"><span class="switch"><input id="set-rotate" type="checkbox"><span class="track"></span></span></div>
+    </div>
+    <p class="field-hint">With a keyboard, press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> during a session to reach these controls. Everything else you type goes to the computer.</p>
+  </form>
+</dialog>
+
+<dialog id="other" class="sheet" aria-labelledby="other-title">
+  <div class="sheet-head">
+    <h2 id="other-title">Different computer</h2>
+    <button class="btn btn-ghost btn-icon" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button>
+  </div>
+  <form id="other-form" class="sheet-body stack">
+    <div class="field">
+      <label for="other-addr">Address shown on that computer</label>
+      <input id="other-addr" class="input mono" placeholder="192.168.1.20:7940" inputmode="url" autocomplete="off" required>
+      <p class="field-hint">Open the Overspan dashboard on the other computer to see its address.</p>
+    </div>
+    <div id="recent" class="stack-sm"></div>
+    <button class="btn btn-primary btn-block" type="submit">Open</button>
+  </form>
+</dialog>
+
+<div class="toast-region" id="toasts" aria-live="polite"></div>
+<script src="/assets/viewer.js"></script>
+</body>
+</html>
