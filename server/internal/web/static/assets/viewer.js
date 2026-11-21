@@ -195,8 +195,9 @@ function onClosed() {
   const wasStreaming = !!session;
   stopStream();
   if (userClosed) { session = null; show('connect'); loadInfo(); return; }
-  const e = lastError;
+  let e = lastError;
   lastError = null;
+  if (e && e.code === 'shutdown' && wasStreaming) e = null; // the computer restarts: keep trying
   if (e) {
     session = null;
     if (e.code === 'pin' || e.code === 'pin-wrong') {

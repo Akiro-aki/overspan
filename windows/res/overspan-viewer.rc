@@ -1,0 +1,28 @@
+// Resources for overspan-viewer.exe: icon 1, the application manifest and
+// version information. Rebuild the .syso with `make windows-res`.
+#pragma code_page(65001)
+1 ICON "overspan.ico"
+1 24 "overspan-viewer.manifest"
+
+1 VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+FILEOS 0x40004
+FILETYPE 0x1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "FileDescription", "Overspan viewer"
+      VALUE "FileVersion", "0.1.0"
+      VALUE "ProductName", "Overspan"
+      VALUE "ProductVersion", "0.1.0"
+      VALUE "OriginalFilename", "overspan-viewer.exe"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END

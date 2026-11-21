@@ -336,10 +336,15 @@ func (v *Viewer) decide(ok bool) {
 	}
 }
 
-func (v *Viewer) stop(reason string) {
+func (v *Viewer) stop(reason string) { v.stopWith("closed", reason) }
+
+// stopWith ends the session, telling the viewer why. Code "shutdown" means
+// the server itself is going away: viewers treat it as a drop and keep
+// trying to reconnect, unlike "closed" (paused or sent away from the dashboard).
+func (v *Viewer) stopWith(code, reason string) {
 	v.stopOnce.Do(func() {
 		if reason != "" {
-			v.sendErr("closed", reason)
+			v.sendErr(code, reason)
 		}
 		close(v.done)
 		v.conn.Close()

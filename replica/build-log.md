@@ -17,6 +17,10 @@
 | C03 | 2026-11-21 | done | none | A sleeping (DPMS off) monitor gives no frames. The server now tells the viewer after 4 s, in both viewers |
 | C04 | 2026-11-21 | done | none | Dialog buttons rendered in ALL CAPS from the platform theme; set to sentence case. The toolbar never auto-hid again after Settings closed; fixed |
 | fix | 2026-11-21 | done | n/a | **Monitor leak**: stopping the server while a viewer was connected left that viewer's virtual monitor on the desktop (the session kept it for the reconnect grace period, and the server exited without waiting). Found when three test monitors were left on this desktop. Shutdown now removes monitors at once and waits for sessions; `tests/shutdown-leak.mjs` guards it |
+| D01 | 2026-11-22 | done | QR scanning (no camera API used) | Child windows paint over the parent, so a dimmed list showed through the sheet. Page controls now hide while a sheet is open and the parent paints their image under the dim layer |
+| D02 | 2026-11-22 | done | none | A server shutdown sent the same `closed` code as a dashboard kick, so no viewer could reconnect after a restart. Added a `shutdown` code; all three viewers retry on it |
+| D03 | 2026-11-22 | partial | pen and the Windows key not run on real Windows (Wine has neither); no clipboard | The toolbar only stayed up while the mouse moved; now it also stays while the pointer rests on it |
+| D04 | 2026-11-22 | done | none | none |
 | W01 | n/a | not started | whole page | n/a |
 | W02 | n/a | not started | whole page | n/a |
 
@@ -29,5 +33,11 @@ Notes
 - Android: `tests/android-e2e.sh` drives the real app in a headless emulator
   (14 checks: add by address, validation, status, approval, streaming, a tap
   moving the desktop pointer, toolbar, settings, disconnect, saved list).
+- Windows: `make windows-e2e` drives the real exe under Wine with the null
+  display driver, through `windows/tools/winprobe` (26 checks: add by
+  address, validation, status, approval, full-screen size, pointer mapping,
+  toolbar, settings, window resize following, reconnect after a server
+  restart, disconnect, PIN wrong and right, paused computer, cleanup). Wine is
+  not Windows: GDI+, DPI scaling and pen input still need a run on real Windows.
 - Clone screenshots in `replica/clone-screens/` capture the real desktop
   (V03 shows the lock screen of this machine). Re-shoot before publishing them.

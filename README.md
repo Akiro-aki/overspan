@@ -37,6 +37,27 @@ The build uses the SDK tools directly (aapt2, javac, d8, apksigner): no Gradle
 and no third-party libraries. The APK is about 85 KB and debug-signed. Set
 `OVERSPAN_KEYSTORE` and `OVERSPAN_KS_PASS` to sign with your own key.
 
+## Windows app
+
+A Windows PC can be the extra screen too: `overspan-viewer.exe` (64-bit
+Windows 10 or 11; Windows on Arm runs it through x64 emulation). It finds
+computers on the network, remembers them, opens the picture full screen or in
+a window (the extra monitor follows the window's size), and sends mouse,
+keyboard, wheel and pen input with pressure and tilt. The Windows key goes to
+the computer while the picture has focus. Ctrl+Alt+Del and Win+L stay with
+Windows. Move the pointer to the top edge, or press Alt+Shift+O, for the
+toolbar.
+
+```sh
+make windows                   # cross-compiles dist/overspan-viewer.exe from any OS; needs Go only
+overspan-viewer.exe 192.168.1.20   # optional: open the connect sheet for an address
+```
+
+It is a single static exe with no installer and no runtime. It is written in
+Go against the Win32 API through the standard library: no cgo and no
+third-party modules. Settings live in `%APPDATA%\Overspan\viewer.json`. The
+exe is not code-signed, so SmartScreen warns on first run.
+
 ## What works where
 
 | Desktop | Extra monitor | Same picture | Input |
@@ -56,7 +77,7 @@ installer adds a `uaccess` udev rule; without udev, add yourself to the
 - TCP 7940: viewer page and stream (`--port` changes it)
 - UDP 7941: discovery replies for native viewers
 
-Open TCP 7940 (and UDP 7941 for the Android app's discovery) in your firewall if devices cannot connect or find the computer.
+Open TCP 7940 (and UDP 7941 for discovery by the Android and Windows apps) in your firewall if devices cannot connect or find the computer.
 
 ## Security
 
@@ -72,6 +93,7 @@ make test     # unit tests (QR codes are decoded with zbarimg when it is install
 make e2e      # full session against the running Hyprland/Sway (creates and removes a monitor)
 make shots    # screenshots of every screen through headless Chromium
 tests/android-e2e.sh   # the Android app in a headless emulator, driven through its UI
+make windows-e2e       # the Windows app under Wine (null display driver: nothing shows), driven through its UI
 ```
 
 Design notes, the protocol and the feature matrix are in `replica/`.

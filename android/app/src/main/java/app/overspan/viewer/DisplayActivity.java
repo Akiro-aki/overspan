@@ -286,6 +286,7 @@ public final class DisplayActivity extends Activity implements WsClient.Listener
         if (userClosed) return;
         JSONObject e = lastError;
         lastError = null;
+        if (e != null && wasLive && "shutdown".equals(e.optString("code"))) e = null; // the computer restarts: keep trying
         if (e != null) {
             String code = e.optString("code");
             if (code.equals("pin") || code.equals("pin-wrong")) {

@@ -7,6 +7,17 @@
   and musl distributions alike. Built for amd64, arm64, 386, armv7, riscv64.
 - **Viewer and dashboard**: plain HTML, CSS and JavaScript embedded in the
   binary (`go:embed`). No build step, no framework, no CDN.
+- **Android viewer**: Java against the platform SDK, built with the raw SDK
+  tools (no Gradle, no libraries).
+- **Windows viewer**: Go against Win32 through `syscall` (no cgo, no
+  modules), cross-compiled to one static x64 exe. `windows/internal/client`
+  holds the protocol, frame decoding, discovery, settings and the connection
+  state machine with no Windows code, so it is unit-tested on Linux.
+  `windows/cmd/overspan-viewer` is the UI: owner-drawn BUTTONs, EDITs and
+  trackbars as real child windows, so Tab, Enter, Esc and screen readers
+  behave as in any dialog. Painting is GDI+ for shapes and GDI for ClearType
+  text, from the same tokens as the web and Android. `windows/tools/winprobe`
+  drives it for tests.
 - **No database**: settings in `$XDG_CONFIG_HOME/overspan/config.json`;
   sessions live in memory.
 
@@ -55,7 +66,10 @@ WebSocket `/ws`. First message from the viewer (text):
 
 Server → viewer text: `wait`, `setup`, `ready {display:{name,w,h}, input}`,
 `size {w,h}`, `input {on}`, `error {code,text}` (codes: pin, pin-wrong,
-denied, timeout, disabled, display, capture, closed, protocol).
+denied, timeout, disabled, display, capture, closed, shutdown, protocol).
+`shutdown` means Overspan itself is stopping. Viewers that were streaming
+treat it as a drop and keep reconnecting. `closed` (paused, or sent away from
+the dashboard) is final.
 
 Server → viewer binary frame (little-endian):
 `'F' | flags u8 (bit0 = full) | seq u32 | width u16 | height u16 | count u16 |
@@ -64,9 +78,10 @@ count × (x u16 | y u16 | w u16 | h u16 | len u32 | JPEG)`
 Viewer → server: `ack {sq}` (flow control: at most two frames in flight),
 `p {e: move|down|up, x, y (0..1), b}`, `rel {dx, dy}`, `btn {b, d}`,
 `w {dx, dy}` (1/120 detent units), `k {c: KeyboardEvent.code, d}`,
-`txt {s}`, `cfg {q, f}`, `resize {w, h}`, `refresh`, `bye`.
+`txt {s}`, `pen {e: hover|down|move|up|leave, x, y, p, tx, ty, b, r}`,
+`cfg {q, f}`, `resize {w, h}`, `refresh`, `bye`.
 
-UDP `port+1`: `OVERSPAN?` → JSON card, for future native viewers.
+UDP `port+1`: `OVERSPAN?` → JSON card, used by the Android and Windows viewers.
 
 ## Security model
 
@@ -86,3 +101,4 @@ UDP `port+1`: `OVERSPAN?` → JSON card, for future native viewers.
 2. uinput, keymap. 3. Hyprland backend (+ Sway, X11). 4. WebSocket, QR.
 5. Server: sessions, approval, dashboard API. 6. Tokens and primitives.
 7. Viewer V01–V04. 8. Dashboard S01–S04. 9. e2e + screenshots. 10. Packaging.
+11. Android viewer C01–C04. 12. Windows viewer D01–D04.

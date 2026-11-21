@@ -5,7 +5,7 @@ F03,server,Linux server on any distribution (static binary + POSIX installer),mu
 F04,server,Windows server driver,must,yes,no,Out of scope for this build. Linux was the requested platform
 F05,server,macOS server,could,yes,no,
 F06,viewer,Browser viewer (any phone tablet PC TV),must,yes,yes,Served by the server itself; no install. Chromium and Safari engines; Firefox untested
-F07,viewer,Native Android / iOS / Windows viewer apps,should,yes,partial,Android app built (Java; no third-party libraries; Android 8+). iOS and Windows not built
+F07,viewer,Native Android / iOS / Windows viewer apps,should,yes,partial,Android (Java; Android 8+) and Windows (Go + Win32; 64-bit Windows 10/11) built and UI-tested (emulator; Wine). iOS not built
 F08,input,Touch input,must,yes,yes,Tap = click; drag after 10px; long press = right click; two-finger scroll; two-finger tap = right click
 F09,input,Trackpad mode for small screens,could,no,yes,Clone extra. Relative pointer with acceleration; long press starts a drag
 F10,input,Mouse input incl. wheel and side buttons,must,yes,yes,Pointer mapping verified live to within 1px
@@ -36,3 +36,7 @@ F34,server,GNOME / KDE Wayland virtual monitors,must,no,no,Needed for full deskt
 F35,server,EVDI kernel-module fallback,could,no,no,
 F36,media,Phone as webcam,could,soon,no,
 F37,web,Website home and download pages,should,yes,no,
+F38,viewer,Windows viewer: full screen or windowed; monitor follows the window,should,no,yes,Clone extra. Verified under Wine: full screen asks for the screen size and a window resize resizes the monitor
+F39,input,Windows viewer: Windows key passed to the computer,could,no,partial,Low-level keyboard hook while the picture has focus. Not testable under Wine; written to the documented API
+F40,input,Windows viewer: pen pressure and tilt (Windows Ink),should,yes,partial,WM_POINTER pen messages to the pen tablet device. Wine has no pen input; not run on real hardware
+F41,server,Viewers reconnect when Overspan restarts on the computer,should,no,yes,Clone extra. New error code shutdown; browser; Android and Windows viewers retry. Verified with the Windows viewer

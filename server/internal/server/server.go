@@ -100,7 +100,7 @@ func (s *Server) Close() {
 	s.kept = map[string]*keptDisplay{}
 	s.mu.Unlock()
 	for _, v := range viewers {
-		v.stop("server shutting down")
+		v.stopWith("shutdown", "Overspan stopped on the computer.")
 	}
 	for _, k := range kept {
 		k.timer.Stop()
