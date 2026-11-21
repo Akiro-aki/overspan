@@ -1,0 +1,119 @@
+/* Overspan design tokens. Components use only these variables: no raw
+   colours or pixel values outside this file. */
+:root {
+  color-scheme: light dark;
+
+  /* colour roles, light */
+  --color-bg: #f4f5f8;
+  --color-surface: #ffffff;
+  --color-surface-2: #eceef3;
+  --color-surface-sunken: #e3e6ed;
+  --color-border: #d5d9e2;
+  --color-border-strong: #b4bac8;
+  --color-text: #161a23;
+  --color-text-muted: #596174;
+  --color-text-faint: #666d80;
+  --color-accent: #2f55e4;
+  --color-accent-hover: #2445c4;
+  --color-accent-soft: #e2e8fd;
+  --color-on-accent: #ffffff;
+  --color-ok: #187a4a;
+  --color-ok-soft: #dcf3e6;
+  --color-warn: #9a5b00;
+  --color-warn-soft: #fbedd3;
+  --color-danger: #c22b3a;
+  --color-danger-soft: #fbe1e4;
+  --color-focus: #2f55e4;
+  --color-overlay: rgba(10, 12, 18, 0.55);
+  --color-stage: #000000;
+  --color-toolbar: rgba(22, 26, 35, 0.86);
+  --color-on-toolbar: #f1f3f8;
+  --color-monitor: #c9d0de;
+  --color-monitor-virtual: #2f55e4;
+
+  /* type */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Cantarell, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-xxl: 2.5rem;
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 550;
+  --weight-bold: 700;
+
+  /* space (4px grid) */
+  --space-0: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-width: 3px;
+  --shadow-1: 0 1px 2px rgba(16, 20, 30, 0.06), 0 1px 1px rgba(16, 20, 30, 0.04);
+  --shadow-2: 0 6px 24px rgba(16, 20, 30, 0.12), 0 2px 6px rgba(16, 20, 30, 0.08);
+  --shadow-3: 0 18px 50px rgba(0, 0, 0, 0.35);
+
+  /* layout */
+  --sidebar-width: 232px;
+  --content-max: 1080px;
+  --header-height: 60px;
+  --control-height: 40px;
+  --control-height-lg: 52px;
+  --touch-min: 44px;
+  --qr-size: 168px;
+  --switch-w: 44px;
+  --switch-h: 26px;
+  --switch-knob: 20px;
+  --icon-size: 20px;
+  --icon-size-lg: 28px;
+  --hairline: 1px;
+
+  /* motion */
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0f1218;
+    --color-surface: #171b23;
+    --color-surface-2: #1e232d;
+    --color-surface-sunken: #0b0d12;
+    --color-border: #2a303c;
+    --color-border-strong: #3d4555;
+    --color-text: #e9ecf3;
+    --color-text-muted: #a3abbd;
+    --color-text-faint: #8a93a7;
+    --color-accent: #6d8bff;
+    --color-accent-hover: #8aa2ff;
+    --color-accent-soft: #1d2747;
+    --color-on-accent: #0b1020;
+    --color-ok: #4cc98a;
+    --color-ok-soft: #12301f;
+    --color-warn: #f0b04a;
+    --color-warn-soft: #3a2a0e;
+    --color-danger: #ff6b78;
+    --color-danger-soft: #3c161b;
+    --color-focus: #8aa2ff;
+    --color-monitor: #3a4252;
+    --color-monitor-virtual: #6d8bff;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+}
