@@ -146,6 +146,8 @@ type Injector struct {
 	kbd     *device
 	held    map[int]bool // keys and buttons currently down, released on Close/ReleaseAll
 	lastPos [2]int32
+	pen     *device // nil if the tablet device could not be created
+	penPrev PenState
 }
 
 // Open creates the virtual devices.
@@ -186,9 +188,10 @@ func Open() (*Injector, error) {
 		ptr.close()
 		return nil, err
 	}
+	pen, _ := openPen() // optional: pointer and keyboard work without it
 	// give udev and the compositor a moment to pick the devices up
 	time.Sleep(150 * time.Millisecond)
-	return &Injector{ptr: ptr, kbd: kbd, held: map[int]bool{}}, nil
+	return &Injector{ptr: ptr, kbd: kbd, pen: pen, held: map[int]bool{}}, nil
 }
 
 // MoveAbs moves the pointer; x and y are in 0..AbsMax over the whole desktop.
@@ -253,6 +256,7 @@ func (in *Injector) Key(code int, down bool) error {
 func (in *Injector) ReleaseAll() {
 	in.mu.Lock()
 	defer in.mu.Unlock()
+	in.penOut()
 	for code, down := range in.held {
 		if !down {
 			continue
@@ -270,6 +274,9 @@ func (in *Injector) Close() {
 	in.ReleaseAll()
 	in.ptr.close()
 	in.kbd.close()
+	if in.pen != nil {
+		in.pen.close()
+	}
 }
 
 func clamp(v int32) int32 { return max(0, min(AbsMax, v)) }

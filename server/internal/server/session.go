@@ -51,6 +51,7 @@ type Viewer struct {
 	statFPS  atomic.Int64 // ×100
 	statKBps atomic.Int64
 	lastAt   atomic.Int64 // unix nano of last frame
+	asleep   atomic.Bool  // viewer was told the screen is asleep
 }
 
 // ViewerDTO is the dashboard's view of a viewer.
@@ -116,6 +117,10 @@ type inMsg struct {
 	W  int     `json:"w"`
 	H  int     `json:"h"`
 	Sq uint32  `json:"sq"`
+	P  float64 `json:"p"`  // pen pressure 0..1
+	TX float64 `json:"tx"` // pen tilt, degrees
+	TY float64 `json:"ty"`
+	R  bool    `json:"r"` // pen is the eraser end
 }
 
 func (v *Viewer) send(msg any) error {
@@ -503,6 +508,10 @@ func (v *Viewer) streamLoop() {
 	}
 	go func() { <-v.done; capr.Close() }()
 
+	// A powered-off (DPMS) or never-drawn output yields no frames at all.
+	// Tell the viewer instead of leaving it on a blank screen.
+	go v.watchFirstFrame(outName)
+
 	enc := encode.New(int(v.quality.Load()))
 	var seq uint32
 	var winFrames, winBytes int64
@@ -572,7 +581,9 @@ func (v *Viewer) streamLoop() {
 		}
 		v.frames.Add(1)
 		v.bytes.Add(int64(len(msg)))
-		v.lastAt.Store(time.Now().UnixNano())
+		if v.lastAt.Swap(time.Now().UnixNano()) == 0 && v.asleep.Swap(false) {
+			v.send(map[string]any{"t": "notice", "code": "clear"})
+		}
 		winFrames++
 		winBytes += int64(len(msg))
 		if el := time.Since(winStart); el >= time.Second {
@@ -663,6 +674,22 @@ func (v *Viewer) handle(m *inMsg) {
 		x, y := v.pos[0], v.pos[1]
 		v.mu.Unlock()
 		v.moveTo(x, y)
+	case "pen": // e: hover | down | move | up | leave; b: 1 = barrel button
+		x, y := clamp01(m.X), clamp01(m.Y)
+		v.mu.Lock()
+		v.pos = [2]float64{x, y}
+		v.mu.Unlock()
+		ax, ay, ok := v.toAbs(x, y)
+		if !ok {
+			return
+		}
+		touching := m.E == "down" || m.E == "move"
+		p := int32(clamp01(m.P) * input.PressureMax)
+		if !touching {
+			p = 0
+		}
+		inj.Pen(input.PenState{X: ax, Y: ay, Pressure: p, TiltX: int32(m.TX), TiltY: int32(m.TY),
+			InRange: m.E != "leave", Touching: touching, Barrel: m.B == 1, Eraser: m.R})
 	case "btn":
 		inj.Button(button(m.B), m.D)
 	case "w":
@@ -714,6 +741,14 @@ func clamp01(f float64) float64 {
 // moveTo maps a point on this viewer's display into global layout space and
 // then onto the absolute pointer's 0..65535 range.
 func (v *Viewer) moveTo(nx, ny float64) {
+	if ax, ay, ok := v.toAbs(nx, ny); ok {
+		v.s.inj.MoveAbs(ax, ay)
+	}
+}
+
+// toAbs maps a normalised point on this viewer's display to the 0..AbsMax
+// range that absolute devices (pointer and pen) use for the whole desktop.
+func (v *Viewer) toAbs(nx, ny float64) (int32, int32, bool) {
 	v.mu.Lock()
 	name := v.output
 	v.mu.Unlock()
@@ -726,7 +761,7 @@ func (v *Viewer) moveTo(nx, ny float64) {
 		}
 	}
 	if !found {
-		return
+		return 0, 0, false
 	}
 	bx, by, bw, bh := vdisplay.Bounds(layout)
 	// keep strictly inside the monitor so the last pixel does not spill over
@@ -734,7 +769,7 @@ func (v *Viewer) moveTo(nx, ny float64) {
 	gy := float64(out.Y) + ny*float64(out.H-1)
 	ax := (gx - float64(bx)) / float64(max(bw-1, 1)) * input.AbsMax
 	ay := (gy - float64(by)) / float64(max(bh-1, 1)) * input.AbsMax
-	v.s.inj.MoveAbs(int32(math.Round(ax)), int32(math.Round(ay)))
+	return int32(math.Round(ax)), int32(math.Round(ay)), true
 }
 
 // resize follows the viewer when it rotates or changes window size.
@@ -770,4 +805,19 @@ func (v *Viewer) resize(w, h int) {
 		v.refresh.Store(true)
 		v.s.logf("info", "Resized %s to %dx%d", name, spec.Width, spec.Height)
 	}()
+}
+
+func (v *Viewer) watchFirstFrame(output string) {
+	select {
+	case <-v.done:
+		return
+	case <-time.After(4 * time.Second):
+	}
+	if v.lastAt.Load() != 0 {
+		return
+	}
+	v.asleep.Store(true)
+	v.s.logf("warn", "No picture from %s yet: the screen may be asleep (power saving)", output)
+	v.send(map[string]any{"t": "notice", "code": "asleep",
+		"text": "The computer's screen is asleep. Touch here or press a key to wake it."})
 }

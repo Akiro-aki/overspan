@@ -36,6 +36,10 @@ browser (it runs on every phone, tablet, PC and TV with a modern browser).
 | V02 | Viewer: Status | Everything between "Connect" and the picture | spinner art, title, text, PIN form, retry/back | connecting, waiting for approval, adding a monitor, PIN, wrong PIN, declined, timed out, paused, lost |
 | V03 | Viewer: Display | The remote screen with input | canvas, pull tab, toolbar (keyboard, touch mode, full screen, settings, disconnect), stats, reconnect banner | streaming, toolbar open, reconnecting, input off |
 | V04 | Viewer: Picture and input | Resolution, quality, fps, touch mode, stats, rotation | sheet dialog, select, sliders, segmented, switches | open/closed |
+| C01 | Android: Computers | Find computers on the network, saved ones, add by address, connect sheet (mode, device name, live status) | header, list of computer cards with status badge, empty state, add button, connect dialog | searching, found, none found, saved only, unreachable, paused, extend unavailable |
+| C02 | Android: Status | Between Connect and the picture | overlay with spinner, title, text, PIN field, retry/back | connecting, waiting, adding a monitor, PIN, wrong PIN, declined, timed out, paused, lost |
+| C03 | Android: Display | Full-screen remote display with input | display view, pull tab, toolbar (keyboard, touch mode, settings, disconnect), stats, reconnect banner | streaming, toolbar open, soft keyboard, reconnecting, backgrounded (paused, resumes) |
+| C04 | Android: Picture and input | Resolution, quality, fps, touch mode, stats, rotation | dialog with radios, sliders, switches | open/closed |
 | W01 | Website: Home | Product pitch and install | | not built |
 | W02 | Website: Download | Per-architecture binaries | | not built |
 

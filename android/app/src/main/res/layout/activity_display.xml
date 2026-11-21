@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/stage">
+
+    <app.overspan.viewer.DisplayView
+        android:id="@+id/display"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/cd_display"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <TextView
+        android:id="@+id/stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/space_2"
+        android:background="@drawable/bg_stats"
+        android:fontFamily="monospace"
+        android:importantForAccessibility="no"
+        android:paddingStart="@dimen/space_2"
+        android:paddingTop="@dimen/space_1"
+        android:paddingEnd="@dimen/space_2"
+        android:paddingBottom="@dimen/space_1"
+        android:textColor="@color/on_toolbar"
+        android:textSize="@dimen/text_xs"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/handle"
+        android:layout_width="@dimen/handle_w"
+        android:layout_height="@dimen/touch_min"
+        android:layout_gravity="top|center_horizontal"
+        android:alpha="0.6"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/tb_show"
+        android:paddingBottom="@dimen/space_5"
+        android:scaleType="fitCenter"
+        android:src="@drawable/bg_handle" />
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="@dimen/space_3"
+        android:background="@drawable/bg_toolbar"
+        android:elevation="@dimen/space_2"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_1"
+        android:visibility="gone">
+        <ImageButton android:id="@+id/tb_keyboard" style="@style/ToolButton" android:contentDescription="@string/tb_keyboard" android:src="@drawable/ic_keyboard" />
+        <ImageButton android:id="@+id/tb_touch" style="@style/ToolButton" android:contentDescription="@string/tb_touch" android:src="@drawable/ic_hand" />
+        <ImageButton android:id="@+id/tb_settings" style="@style/ToolButton" android:contentDescription="@string/tb_settings" android:src="@drawable/ic_gear" />
+        <ImageButton android:id="@+id/tb_disconnect" style="@style/ToolButton" android:contentDescription="@string/tb_disconnect" android:src="@drawable/ic_power" android:tint="@color/danger" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/space_5"
+        android:background="@drawable/bg_banner"
+        android:accessibilityLiveRegion="polite"
+        android:padding="@dimen/space_3"
+        android:textColor="@color/warn"
+        android:textSize="@dimen/text_sm"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/overlay"
+        android:clickable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/space_5">
+        <ProgressBar
+            android:id="@+id/status_spin"
+            android:layout_width="@dimen/spinner"
+            android:layout_height="@dimen/spinner"
+            android:indeterminateTint="@color/accent" />
+        <TextView
+            android:id="@+id/status_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:accessibilityHeading="true"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center"
+            android:text="@string/st_connecting"
+            android:textColor="@color/on_overlay"
+            android:textSize="@dimen/text_xl"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2"
+            android:gravity="center"
+            android:maxWidth="@dimen/content_max"
+            android:textColor="@color/on_overlay_muted"
+            android:textSize="@dimen/text_md" />
+        <LinearLayout
+            android:id="@+id/pin_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <EditText
+                android:id="@+id/pin"
+                style="@style/Field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/content_max"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:hint="@string/pin"
+                android:imeOptions="actionDone"
+                android:importantForAutofill="no"
+                android:inputType="numberPassword"
+                android:maxLength="12"
+                android:textSize="@dimen/text_xl" />
+            <TextView
+                android:id="@+id/pin_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_1"
+                android:accessibilityLiveRegion="assertive"
+                android:textColor="@color/danger"
+                android:textSize="@dimen/text_sm" />
+            <Button android:id="@+id/pin_go" style="@style/Button.Primary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_3" android:text="@string/continue_" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_5"
+            android:orientation="horizontal">
+            <Button android:id="@+id/btn_retry" style="@style/Button.Primary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="@dimen/space_2" android:minWidth="120dp" android:text="@string/retry" android:visibility="gone" />
+            <Button android:id="@+id/btn_back" style="@style/Button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="120dp" android:text="@string/back" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

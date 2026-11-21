@@ -11,6 +11,11 @@
 | V02 | 2026-11-21 | done | none | Creating a monitor takes about 5 s on Ryoku (settle time), so a "setting up" state was added |
 | V03 | 2026-11-21 | partial | pen pressure and tilt; keyboard shortcuts the browser itself grabs (Ctrl+W, Ctrl+T, Super) never reach the page | Keyboard users could not reach the toolbar because every key is forwarded. Added a local Alt+Shift+O shortcut |
 | V04 | 2026-11-21 | done | none | none |
+| pen | 2026-11-21 | done | pressure not checked by eye in a drawing app | Hyprland lists the uinput tablet as `overspan-pen`; hover maps within 1px |
+| C01 | 2026-11-21 | done | QR scanning (the camera would need a decoder library) | This machine's ufw drops broadcasts, so discovery also probes saved computers directly |
+| C02 | 2026-11-21 | done | none | none |
+| C03 | 2026-11-21 | done | none | A sleeping (DPMS off) monitor gives no frames. The server now tells the viewer after 4 s, in both viewers |
+| C04 | 2026-11-21 | done | none | none |
 | W01 | n/a | not started | whole page | n/a |
 | W02 | n/a | not started | whole page | n/a |
 

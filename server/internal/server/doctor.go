@@ -91,10 +91,10 @@ func orDash(s string) string {
 
 func firewallHint() string {
 	if out, err := exec.Command("systemctl", "is-active", "firewalld").Output(); err == nil && strings.TrimSpace(string(out)) == "active" {
-		return "sudo firewall-cmd --add-port=7940/tcp --permanent && sudo firewall-cmd --reload"
+		return "sudo firewall-cmd --permanent --add-port=7940/tcp --add-port=7941/udp && sudo firewall-cmd --reload"
 	}
 	if out, err := exec.Command("systemctl", "is-active", "ufw").Output(); err == nil && strings.TrimSpace(string(out)) == "active" {
-		return "sudo ufw allow 7940/tcp"
+		return "sudo ufw allow 7940/tcp && sudo ufw allow 7941/udp   (7941/udp lets the Android app find this computer)"
 	}
 	return ""
 }

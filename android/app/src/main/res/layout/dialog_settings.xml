@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/space_5"
+    android:paddingTop="@dimen/space_2"
+    android:paddingEnd="@dimen/space_5">
+    <TextView style="@style/Text.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/set_resolution" />
+    <TextView style="@style/Text.Muted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/set_resolution_hint" />
+    <RadioGroup android:id="@+id/s_res" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <RadioButton android:id="@+id/s_res_native" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:buttonTint="@color/accent" android:text="@string/res_native" />
+        <RadioButton android:id="@+id/s_res_balanced" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:buttonTint="@color/accent" android:text="@string/res_balanced" />
+        <RadioButton android:id="@+id/s_res_light" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:buttonTint="@color/accent" android:text="@string/res_light" />
+    </RadioGroup>
+
+    <TextView android:id="@+id/s_quality_label" style="@style/Text.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_4" android:labelFor="@+id/s_quality" />
+    <SeekBar android:id="@+id/s_quality" android:layout_width="match_parent" android:layout_height="@dimen/touch_min" android:max="13" android:progressTint="@color/accent" android:thumbTint="@color/accent" />
+
+    <TextView android:id="@+id/s_fps_label" style="@style/Text.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_2" android:labelFor="@+id/s_fps" />
+    <SeekBar android:id="@+id/s_fps" android:layout_width="match_parent" android:layout_height="@dimen/touch_min" android:max="10" android:progressTint="@color/accent" android:thumbTint="@color/accent" />
+
+    <TextView style="@style/Text.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_2" android:text="@string/set_touch" />
+    <TextView style="@style/Text.Muted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/set_touch_hint" />
+    <RadioGroup android:id="@+id/s_touch" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <RadioButton android:id="@+id/s_touch_direct" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:buttonTint="@color/accent" android:text="@string/touch_direct_short" />
+        <RadioButton android:id="@+id/s_touch_pad" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:buttonTint="@color/accent" android:text="@string/touch_trackpad_short" />
+    </RadioGroup>
+
+    <Switch android:id="@+id/s_stats" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/space_3" android:minHeight="@dimen/touch_min" android:text="@string/set_stats" android:textSize="@dimen/text_md" android:thumbTint="@color/accent" />
+    <Switch android:id="@+id/s_rotate" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/touch_min" android:text="@string/set_rotate" android:textSize="@dimen/text_md" android:thumbTint="@color/accent" />
+    <TextView style="@style/Text.Muted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/set_rotate_hint" />
+</LinearLayout>
+</ScrollView>

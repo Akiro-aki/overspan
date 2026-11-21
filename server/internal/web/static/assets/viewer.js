@@ -181,6 +181,10 @@ function onText(m) {
     case 'size':
       if (session) { session.w = m.w; session.h = m.h; }
       break;
+    case 'notice':
+      if (m.code === 'asleep') showBanner(m.text);
+      else hideBanner();
+      break;
     case 'input':
       if (session) { session.input = m.on; toast(m.on ? 'Input turned on' : 'Input turned off by the computer'); }
       break;
@@ -394,10 +398,19 @@ const SLOP = 10;
 
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
+// pen: real pressure, tilt, barrel button and eraser through the server's tablet device
+function pen(e, kind) {
+  const p = norm(e.clientX, e.clientY);
+  const msg = { t: 'pen', e: kind, x: p.x, y: p.y, p: e.pressure || 0, tx: e.tiltX || 0, ty: e.tiltY || 0,
+    b: (e.buttons & 2) ? 1 : 0, r: (e.buttons & 32) !== 0 };
+  if (kind === 'move' || kind === 'hover') queueMove(msg); else { flushMove(); send(msg); }
+}
+
 canvas.addEventListener('pointerdown', (e) => {
   if (!session) return;
   canvas.setPointerCapture(e.pointerId);
   hideToolbar();
+  if (e.pointerType === 'pen') { pen(e, 'down'); return; }
   if (e.pointerType !== 'touch') { ptr(e, 'down', e.button); return; }
   e.preventDefault();
   touches.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now() });
@@ -419,6 +432,7 @@ canvas.addEventListener('pointerdown', (e) => {
 
 canvas.addEventListener('pointermove', (e) => {
   if (!session) return;
+  if (e.pointerType === 'pen') { pen(e, e.buttons & 1 ? 'move' : 'hover'); return; }
   if (e.pointerType !== 'touch') { ptr(e, 'move'); return; }
   const t = touches.get(e.pointerId);
   if (!t || !gesture) return;
@@ -458,6 +472,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 function endTouch(e) {
+  if (e.pointerType === 'pen') { if (session) pen(e, 'hover'); return; }
   if (e.pointerType !== 'touch') { if (session) ptr(e, 'up', e.button); return; }
   const t = touches.get(e.pointerId);
   touches.delete(e.pointerId);
@@ -484,6 +499,7 @@ function endTouch(e) {
 }
 canvas.addEventListener('pointerup', endTouch);
 canvas.addEventListener('pointercancel', endTouch);
+canvas.addEventListener('pointerleave', (e) => { if (session && e.pointerType === 'pen') pen(e, 'leave'); });
 
 canvas.addEventListener('wheel', (e) => {
   if (!session) return;

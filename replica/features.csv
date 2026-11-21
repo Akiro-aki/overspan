@@ -5,16 +5,16 @@ F03,server,Linux server on any distribution (static binary + POSIX installer),mu
 F04,server,Windows server driver,must,yes,no,Out of scope for this build. Linux was the requested platform
 F05,server,macOS server,could,yes,no,
 F06,viewer,Browser viewer (any phone tablet PC TV),must,yes,yes,Served by the server itself; no install. Chromium and Safari engines; Firefox untested
-F07,viewer,Native Android / iOS / Windows viewer apps,should,yes,no,Web app manifest only. Install to home screen needs HTTPS (not built)
+F07,viewer,Native Android / iOS / Windows viewer apps,should,yes,partial,Android app built (Java; no third-party libraries; Android 8+). iOS and Windows not built
 F08,input,Touch input,must,yes,yes,Tap = click; drag after 10px; long press = right click; two-finger scroll; two-finger tap = right click
 F09,input,Trackpad mode for small screens,could,no,yes,Clone extra. Relative pointer with acceleration; long press starts a drag
 F10,input,Mouse input incl. wheel and side buttons,must,yes,yes,Pointer mapping verified live to within 1px
 F11,input,Keyboard input (physical and on-screen),must,yes,yes,Physical keys use evdev codes so the desktop layout applies. On-screen text is sent as US-layout key presses (non-US layouts can type wrong symbols)
-F12,input,Stylus with pressure and tilt,should,yes,partial,Pen works as a mouse. No pressure or tilt (needs a uinput tablet device)
+F12,input,Stylus with pressure and tilt,should,yes,yes,Virtual uinput tablet with pressure (4096 levels) tilt barrel button and eraser. Hover mapping verified live; pressure in a drawing app not checked by eye
 F13,server,Multiple viewers at once,must,yes,yes,Each viewer gets its own monitor and capture. Built for concurrency; not load-tested beyond sequential sessions
 F14,network,Wi-Fi and LAN,must,yes,yes,
 F15,network,USB connection,should,yes,partial,Works over USB tethering (it is just another network interface). No ADB port-forward helper
-F16,network,Auto discovery of servers,should,yes,partial,UDP responder on port+1 for native viewers. Browsers cannot use UDP so the web viewer joins by QR code or address
+F16,network,Auto discovery of servers,should,yes,yes,Android app broadcasts on UDP 7941 and lists replies. The web viewer still joins by QR code or address (browsers cannot send UDP)
 F17,network,QR code to join,could,no,yes,Own encoder; every QR version decodes in zbarimg
 F18,network,Remote use outside the LAN,could,yes,partial,Works over a VPN such as Tailscale (interfaces are listed). No relay service
 F19,media,Audio redirection,should,yes,no,Next step: PipeWire monitor capture to WebAudio

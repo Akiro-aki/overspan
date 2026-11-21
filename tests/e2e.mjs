@@ -72,6 +72,16 @@ await v1.until(() => v1.frames.length >= 2, 3000);
 ok(v1.frames.length >= 2, `cursor movement produced a partial update (${v1.frames.length} frames)`);
 const later = v1.frames.slice(1);
 ok(later.length === 0 || later.every((f) => !f.full), 'later frames are partial');
+// pen: hover (no contact, so nothing is clicked) at a quarter / three quarters
+const devs = hypr('devices');
+ok(/overspan[- ]pen/i.test(devs), 'compositor sees the virtual pen tablet');
+v1.ws.send(JSON.stringify({ t: 'pen', e: 'hover', x: 0.25, y: 0.75 }));
+await sleep(300);
+const pp = JSON.parse(hypr('cursorpos', '-j'));
+const px = mon.x + 320, py = mon.y + 600;
+ok(Math.abs(pp.x - px) <= 4 && Math.abs(pp.y - py) <= 4, `pen hover landed at ${pp.x},${pp.y} (expected ~${px},${py})`);
+v1.ws.send(JSON.stringify({ t: 'pen', e: 'leave', x: 0.25, y: 0.75 }));
+await sleep(100);
 try { hypr('dispatch', 'movecursor', String(before.x), String(before.y)); } catch { /* Lua-config Hyprland uses a different dispatch syntax */ }
 
 st = await api('GET', '/api/state');

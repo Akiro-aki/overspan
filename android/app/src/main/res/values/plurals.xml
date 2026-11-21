@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="found_count">
+        <item quantity="one">%d computer on this network</item>
+        <item quantity="other">%d computers on this network</item>
+    </plurals>
+</resources>

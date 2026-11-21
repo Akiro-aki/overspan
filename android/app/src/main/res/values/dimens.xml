@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+    <dimen name="space_3">12dp</dimen>
+    <dimen name="space_4">16dp</dimen>
+    <dimen name="space_5">24dp</dimen>
+    <dimen name="space_6">32dp</dimen>
+    <dimen name="space_7">48dp</dimen>
+    <dimen name="radius_sm">6dp</dimen>
+    <dimen name="radius_md">10dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
+    <dimen name="text_lg">20sp</dimen>
+    <dimen name="text_xl">28sp</dimen>
+    <dimen name="control_height">48dp</dimen>
+    <dimen name="control_height_lg">56dp</dimen>
+    <dimen name="touch_min">48dp</dimen>
+    <dimen name="icon">24dp</dimen>
+    <dimen name="icon_lg">40dp</dimen>
+    <dimen name="avatar">40dp</dimen>
+    <dimen name="hairline">1dp</dimen>
+    <dimen name="content_max">560dp</dimen>
+    <dimen name="handle_w">64dp</dimen>
+    <dimen name="handle_h">22dp</dimen>
+    <dimen name="spinner">56dp</dimen>
+</resources>
