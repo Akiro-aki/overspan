@@ -1,0 +1,38 @@
+id,area,feature,priority,original,clone,note
+F01,server,Extend the desktop with a virtual monitor,must,yes,partial,Hyprland: tested live. Sway and X11: written but not run live. GNOME and KDE Wayland: not built
+F02,server,Mirror an existing monitor,must,yes,yes,Tested live: wlr-screencopy on Hyprland. X11 path through ffmpeg x11grab not run live
+F03,server,Linux server on any distribution (static binary + POSIX installer),must,no,yes,Requested addition. One static ELF each for amd64 arm64 386 armv7 riscv64; glibc or musl
+F04,server,Windows server driver,must,yes,no,Out of scope for this build. Linux was the requested platform
+F05,server,macOS server,could,yes,no,
+F06,viewer,Browser viewer (any phone tablet PC TV),must,yes,yes,Served by the server itself; no install. Chromium and Safari engines; Firefox untested
+F07,viewer,Native Android / iOS / Windows viewer apps,should,yes,no,Web app manifest only. Install to home screen needs HTTPS (not built)
+F08,input,Touch input,must,yes,yes,Tap = click; drag after 10px; long press = right click; two-finger scroll; two-finger tap = right click
+F09,input,Trackpad mode for small screens,could,no,yes,Clone extra. Relative pointer with acceleration; long press starts a drag
+F10,input,Mouse input incl. wheel and side buttons,must,yes,yes,Pointer mapping verified live to within 1px
+F11,input,Keyboard input (physical and on-screen),must,yes,yes,Physical keys use evdev codes so the desktop layout applies. On-screen text is sent as US-layout key presses (non-US layouts can type wrong symbols)
+F12,input,Stylus with pressure and tilt,should,yes,partial,Pen works as a mouse. No pressure or tilt (needs a uinput tablet device)
+F13,server,Multiple viewers at once,must,yes,yes,Each viewer gets its own monitor and capture. Built for concurrency; not load-tested beyond sequential sessions
+F14,network,Wi-Fi and LAN,must,yes,yes,
+F15,network,USB connection,should,yes,partial,Works over USB tethering (it is just another network interface). No ADB port-forward helper
+F16,network,Auto discovery of servers,should,yes,partial,UDP responder on port+1 for native viewers. Browsers cannot use UDP so the web viewer joins by QR code or address
+F17,network,QR code to join,could,no,yes,Own encoder; every QR version decodes in zbarimg
+F18,network,Remote use outside the LAN,could,yes,partial,Works over a VPN such as Tailscale (interfaces are listed). No relay service
+F19,media,Audio redirection,should,yes,no,Next step: PipeWire monitor capture to WebAudio
+F20,media,Video wall / signage spanning several screens,could,yes,no,
+F21,media,Rotation,could,yes,partial,Follows device portrait/landscape and resizes the monitor. No arbitrary angles
+F22,settings,Resolution control,must,yes,yes,Viewer presets (full / balanced / light) and a server-side cap
+F23,settings,Image quality / compression,must,yes,yes,JPEG quality per viewer; only changed tiles are sent
+F24,settings,Frame rate limit,should,yes,yes,
+F25,settings,Show or hide the pointer in the picture,should,yes,yes,
+F26,security,Approve new devices,should,yes,yes,Accept once / accept and remember / decline; 2 minute timeout
+F27,security,PIN,should,yes,yes,
+F28,security,Remembered devices with revoke,could,yes,yes,
+F29,security,Dashboard locked to this computer,must,no,yes,Loopback peer + local Host header + per-run key
+F30,security,Encrypted transport (TLS),should,no,no,Plain HTTP/WebSocket on the LAN
+F31,server,Server on/off,must,yes,yes,Turning it off disconnects every viewer
+F32,server,Keep the monitor through short drops and reconnect,should,yes,yes,Reconnect reuses the same monitor so windows stay put
+F33,server,Diagnostics (what works here and how to fix it),could,no,yes,Dashboard System page and `overspan doctor`
+F34,server,GNOME / KDE Wayland virtual monitors,must,no,no,Needed for full desktop coverage: screencast portal over D-Bus and PipeWire
+F35,server,EVDI kernel-module fallback,could,no,no,
+F36,media,Phone as webcam,could,soon,no,
+F37,web,Website home and download pages,should,yes,no,
